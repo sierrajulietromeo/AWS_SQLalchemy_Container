@@ -1,6 +1,6 @@
-# Flask Todo App for AWS Elastic Beanstalk
+# Flask Todo App with Docker
 
-This repository contains a simple Flask-based Todo application designed for deployment on AWS Elastic Beanstalk with flexible database configuration.
+This repository contains a simple Flask-based Todo application designed for containerized deployment with flexible database configuration.
 
 ## Features
 
@@ -9,13 +9,12 @@ This repository contains a simple Flask-based Todo application designed for depl
 - Configurable database backend:
   - Uses `DATABASE_URL` environment variable if set (supports PostgreSQL, MySQL, etc.)
   - Defaults to SQLite for local development
-- Ready for deployment on Elastic Beanstalk with RDS integration
 
 ## Database Configuration
 
 The application automatically detects and uses the appropriate database:
 
-- **Production (Elastic Beanstalk + RDS)**: Set `DATABASE_URL` environment variable
+- **Production**: Set `DATABASE_URL` environment variable
   - PostgreSQL: `postgresql://user:password@host:port/dbname`
   - MySQL: `mysql://user:password@host:port/dbname`
 - **Local Development**: Defaults to SQLite (`sqlite:///todo.db`) if no `DATABASE_URL` is set
@@ -24,7 +23,8 @@ The application automatically detects and uses the appropriate database:
 
 ### Prerequisites
 
-- Python 3.x
+- Python 3.x (for local development)
+- Docker (for containerized deployment)
 
 ### Local Development
 
@@ -54,32 +54,25 @@ The application automatically detects and uses the appropriate database:
 
 The app will be available at `http://localhost:8080`
 
-### Deploying to Elastic Beanstalk
+### Docker Deployment
 
-#### Option 1: Using RDS (Recommended)
+#### Building the Docker Image
 
-1. Create an RDS instance (PostgreSQL or MySQL recommended)
+```bash
+docker build -t flask-todo-app .
+```
 
-2. Set the `DATABASE_URL` environment variable in Elastic Beanstalk:
-   - **Via EB Console**: Configuration → Software → Environment variables
-   - **Via EB CLI**: `eb setenv DATABASE_URL=postgresql://user:pass@rds-endpoint:5432/dbname`
-   - **Via .ebextensions**: Add to your configuration files
+#### Running the Container
 
-3. Zip your project files and deploy:
-    ```bash
-    # Include these files in your zip
-    application.py
-    requirements.txt
-    templates/
-    .ebextensions/
-    ```
+With SQLite (default):
+```bash
+docker run -p 8080:8080 flask-todo-app
+```
 
-4. Upload via AWS Elastic Beanstalk console
-
-#### Option 2: Using SQLite (Not recommended for production)
-
-- Deploy without setting `DATABASE_URL` - the app will use SQLite
-- Note: SQLite files are not persistent across deployments in EB
+With PostgreSQL:
+```bash
+docker run -p 8080:8080 -e DATABASE_URL=postgresql://user:password@host:port/dbname flask-todo-app
+```
 
 ### Environment Variable Configuration
 
@@ -88,12 +81,11 @@ The app will be available at `http://localhost:8080`
 DATABASE_URL=postgresql://user:password@localhost:5432/todo_dev
 ```
 
-#### Elastic Beanstalk Environment Variables
-Set via EB Console, CLI, or `.ebextensions/database.config`:
-```yaml
-option_settings:
-  aws:elasticbeanstalk:application:environment:
-    DATABASE_URL: postgresql://user:password@your-rds-endpoint:5432/dbname
+#### Docker Environment Variables
+```bash
+docker run -p 8080:8080 \
+  -e DATABASE_URL=postgresql://user:password@host:port/dbname \
+  flask-todo-app
 ```
 
 ## Project Structure
@@ -102,12 +94,13 @@ option_settings:
 .
 ├── application.py          # Main Flask application
 ├── requirements.txt        # Python dependencies
-├── templates/             # HTML templates
+├── templates/              # HTML templates
 │   ├── index.html
 │   └── tasks.html
-├── .ebextensions/         # EB configuration
-│   └── flask.config
-├── .env                   # Local environment variables (optional)
+├── static/                 # Static assets
+│   └── style.css
+├── Dockerfile              # Docker configuration
+├── .env                    # Local environment variables (optional)
 └── README.md
 ```
 
@@ -126,6 +119,6 @@ Database tables are automatically created on first run.
 
 - The application uses SQLAlchemy ORM for database operations, making it database-agnostic
 - Database tables are created automatically when the application starts
-- For production deployments, use RDS with PostgreSQL or MySQL for better performance and reliability
+- For production deployments, use PostgreSQL or MySQL for better performance and reliability
 - SQLite is suitable for development and testing only
 - Remember to add `.env` to your `.gitignore` if storing sensitive database credentials locally
