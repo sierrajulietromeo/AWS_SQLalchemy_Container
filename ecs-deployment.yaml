@@ -1,3 +1,7 @@
+
+## This file is not needed by the application when setting up using the AWS Console, this is only of interest if you were considering using IaC to deploy via the command line, and that is not expected for this module.
+
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Flask Todo App ECS Deployment'
 
