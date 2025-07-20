@@ -1,6 +1,6 @@
 # Flask Todo App with Docker
 
-This repository contains a simple Flask-based Todo application designed for containerized deployment with flexible database configuration.
+This repository contains a simple Flask-based Todo application designed for containerised deployment with flexible database configuration.
 
 ## Features
 
@@ -24,7 +24,7 @@ The application automatically detects and uses the appropriate database:
 ### Prerequisites
 
 - Python 3.x (for local development)
-- Docker (for containerized deployment)
+- Docker (for containerised deployment)
 
 ### Local Development
 
