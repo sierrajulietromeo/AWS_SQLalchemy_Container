@@ -1,0 +1,46 @@
++---------------------+     +----------------------+     +----------------------+
+|                     |     |                      |     |                      |
+|  Developer Machine  +---->+  Amazon ECR Registry +---->+  ECS Cluster         |
+|                     |     |  flask-todo-app      |     |  flask-todo-cluster  |
++---------------------+     +----------------------+     +----------+-----------+
+                                                                   |
+                                                                   | pulls image
+                                                                   v
+                                                      +----------------------+
+                                                      |                      |
+                                                      |  ECS Service        |
+                                                      |  flask-todo-service |
+                                                      +----------+-----------+
+                                                                 |
++---------------------+                                          |
+|                     |     +----------------------+             |
+|  Internet Users     +---->|  Application Load    |----------->+
+|                     |     |  Balancer (Optional) |
++---------------------+     +----------------------+
+                                                                   |
+                                                                   | connects to
+                                                                   v
+                                                      +----------------------+
+                                                      |                      |
+                                                      |  Amazon RDS          |
+                                                      |  PostgreSQL          |
+                                                      |  (Optional)          |
+                                                      +----------------------+
+
+Architecture Flow:
+
+1. Developer builds Docker image locally and pushes to Amazon ECR
+2. ECS Task Definition references the ECR image
+3. ECS Service runs tasks based on the Task Definition
+4. Internet users can access the application either:
+   a. Directly via ECS tasks with public IPs, or
+   b. Through an optional Application Load Balancer
+5. ECS tasks connect to RDS PostgreSQL database (if configured)
+
+AWS Components:
+- Amazon ECR: Stores the Docker image for the Flask application
+- Amazon ECS (Fargate): Runs the containerised application
+- Application Load Balancer (Optional): Routes traffic to the ECS tasks
+- Amazon RDS (Optional): PostgreSQL database for persistent storage
+- VPC with public and private subnets (not shown in diagram)
+- Security Groups (not shown in diagram)
